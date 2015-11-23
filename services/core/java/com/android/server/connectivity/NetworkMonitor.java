@@ -286,7 +286,15 @@ public class NetworkMonitor extends StateMachine {
 
         mServer = Settings.Global.getString(mContext.getContentResolver(),
                 Settings.Global.CAPTIVE_PORTAL_SERVER);
-        if (mServer == null) mServer = DEFAULT_SERVER;
+        if (mServer == null) {
+            mServer = SystemProperties.get("ro.net.captive_server");
+            if (mServer == null || mServer.length() == 0) {
+                mServer = DEFAULT_SERVER;
+            } else {
+                Settings.Global.putString(mContext.getContentResolver(),
+                        Settings.Global.CAPTIVE_PORTAL_SERVER, mServer);
+            }
+        }
 
         mLingerDelayMs = SystemProperties.getInt(LINGER_DELAY_PROPERTY, DEFAULT_LINGER_DELAY_MS);
         mReevaluateDelayMs = SystemProperties.getInt(REEVALUATE_DELAY_PROPERTY,
